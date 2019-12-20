@@ -6,8 +6,8 @@
     <atom:link href="https://blog.benelog.net//feed.xml" rel="self" type="application/rss+xml" />
     <description>JBake Bootstrap Template</description>
     <language>en-gb</language>
-    <pubDate>Sat, 14 Dec 2019 10:15:06 +0000</pubDate>
-    <lastBuildDate>Sat, 14 Dec 2019 10:15:06 +0000</lastBuildDate>
+    <pubDate>Fri, 20 Dec 2019 02:22:24 +0000</pubDate>
+    <lastBuildDate>Fri, 20 Dec 2019 02:22:24 +0000</lastBuildDate>
 
     <item>
       <title>ktlint로 Kotlin 공식 코딩 컨벤션 맞추기</title>
@@ -299,7 +299,7 @@ Gradle이 별도로 설치되어 있을 경우 Gradle Wrapper를 업그레이드
 &lt;p&gt;앞에서 설명한 것처럼 &lt;code&gt;ktlintFormat&lt;/code&gt; 태스크는 의도하지 않게 파일을 바꿀 위험이 있기 때문에 &lt;code&gt;addKtlintCheckGitPreCommitHook&lt;/code&gt; 를 더 권장합니다.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;등록된 pre-commit hook은 &lt;code&gt;rm .git/hooks/pre-commit&lt;/code&gt; 명령으로 등삭제할 수 있습니다.&lt;/p&gt;
+&lt;p&gt;등록된 pre-commit hook은 &lt;code&gt;rm .git/hooks/pre-commit&lt;/code&gt; 명령으로 삭제할 수 있습니다.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
