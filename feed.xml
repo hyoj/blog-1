@@ -6,8 +6,8 @@
     <atom:link href="https://blog.benelog.net//feed.xml" rel="self" type="application/rss+xml" />
     <description>JBake Bootstrap Template</description>
     <language>en-gb</language>
-    <pubDate>Mon, 16 Mar 2020 00:19:49 +0000</pubDate>
-    <lastBuildDate>Mon, 16 Mar 2020 00:19:49 +0000</lastBuildDate>
+    <pubDate>Mon, 16 Mar 2020 00:26:58 +0000</pubDate>
+    <lastBuildDate>Mon, 16 Mar 2020 00:26:58 +0000</lastBuildDate>
 
     <item>
       <title>Jackson으로 파싱한 JSON 속성값을 생성자로 전달하기</title>
@@ -237,7 +237,7 @@ public class AccessLog {
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;Lombok을 활용한다면 이 과정을 더 편하게 할 수 있습니다.
-&lt;code&gt;lombok.config`를 다음과 같은 선언을 하면 Lombok에서 만드는 생성자에서 `@ConstructorProperties&lt;/code&gt; 를 자동으로 넣어줍니다.&lt;/p&gt;
+&lt;code&gt;lombok.config&lt;/code&gt; 를 다음과 같은 선언을 하면 Lombok에서 만드는 생성자에서 &lt;code&gt;@ConstructorProperties&lt;/code&gt; 를 자동으로 넣어줍니다.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;title&quot;&gt;lombok.config 설정&lt;/div&gt;
@@ -425,6 +425,50 @@ Gradle을 쓰고 있다면 아래와 같이 설정할 수 있습니다.&lt;/p&gt
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;&lt;code&gt;RestTeamplteBuilder&lt;/code&gt; 로 RestTemplate을 생성한다면 디폴트 등록된 ObjectMapper 을 참조하는  &lt;code&gt;MappingJackson2HttpMessageConverter&lt;/code&gt; 가 &lt;code&gt;RestTemplate&lt;/code&gt; 에 주입됩니다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Lombok과 함께 쓸때에도 &lt;code&gt;lombok.config&lt;/code&gt; 의 추가 설정 없이도 잘 동작합니다.
+이 방식의 장단점은&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;장점&lt;/p&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;코드가 짧습니다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Jackson에 대한 의존성이 없습니다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;단점&lt;/p&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;생성자의 파라미터명과 JSON 속성의 이름이 반드시 일치해야 합니다.&lt;/p&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;생성자의 파라미터 이름이 JSON파싱에 쓰인다는것을 의식하지 않는다면, 파라미터 명을 잘 모르고 고쳐서 JSON 파싱이 안되게 하는 부작용이 쓰일수 있습니다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;컴파일 옵션을 의식하지 않으면 특정 개발자의 IDE에서는 의도대로 동작하지 않을수 있습니다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;생성자가 여러 개 일때는 &lt;code&gt;@JsonCreator&lt;/code&gt; 와 같은 다른 방식과 병행해서 써야 합니다.&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;

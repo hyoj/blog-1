@@ -399,7 +399,7 @@ public class AccessLog {
 </div>
 <div class="paragraph">
 <p>Lombok을 활용한다면 이 과정을 더 편하게 할 수 있습니다.
-<code>lombok.config`를 다음과 같은 선언을 하면 Lombok에서 만드는 생성자에서 `@ConstructorProperties</code> 를 자동으로 넣어줍니다.</p>
+<code>lombok.config</code> 를 다음과 같은 선언을 하면 Lombok에서 만드는 생성자에서 <code>@ConstructorProperties</code> 를 자동으로 넣어줍니다.</p>
 </div>
 <div class="listingblock">
 <div class="title">lombok.config 설정</div>
@@ -587,6 +587,50 @@ Gradle을 쓰고 있다면 아래와 같이 설정할 수 있습니다.</p>
 </li>
 <li>
 <p><code>RestTeamplteBuilder</code> 로 RestTemplate을 생성한다면 디폴트 등록된 ObjectMapper 을 참조하는  <code>MappingJackson2HttpMessageConverter</code> 가 <code>RestTemplate</code> 에 주입됩니다.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Lombok과 함께 쓸때에도 <code>lombok.config</code> 의 추가 설정 없이도 잘 동작합니다.
+이 방식의 장단점은</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>장점</p>
+<div class="ulist">
+<ul>
+<li>
+<p>코드가 짧습니다.</p>
+</li>
+<li>
+<p>Jackson에 대한 의존성이 없습니다.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>단점</p>
+<div class="ulist">
+<ul>
+<li>
+<p>생성자의 파라미터명과 JSON 속성의 이름이 반드시 일치해야 합니다.</p>
+<div class="ulist">
+<ul>
+<li>
+<p>생성자의 파라미터 이름이 JSON파싱에 쓰인다는것을 의식하지 않는다면, 파라미터 명을 잘 모르고 고쳐서 JSON 파싱이 안되게 하는 부작용이 쓰일수 있습니다.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>컴파일 옵션을 의식하지 않으면 특정 개발자의 IDE에서는 의도대로 동작하지 않을수 있습니다.</p>
+</li>
+<li>
+<p>생성자가 여러 개 일때는 <code>@JsonCreator</code> 와 같은 다른 방식과 병행해서 써야 합니다.</p>
 </li>
 </ul>
 </div>
