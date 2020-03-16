@@ -1,0 +1,1753 @@
+<!DOCTYPE HTML>
+<!--
+    Future Imperfect by HTML5 UP
+    html5up.net | @n33co
+    Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <title>Jackson으로 파싱한 JSON 속성값을 생성자로 전달하기 - 개발수양록</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Jackson으로 JSON을 파싱한 속성값을 객체의 생성자로 전달할 수 있는 여러가지 방법을 정리했습니다.">
+    <meta name="author" content="정상혁">
+    <meta name="keywords" content="jackson, java">
+    <meta name="generator" content="JBake">
+	<meta property="og:image" content="https://blog.benelog.net/img/jackson/text-blocks.png"/>
+
+    <link rel="stylesheet" href="css/google-font.css" />
+    <link rel="stylesheet" href="css/font-awesome.min.css" />
+    <link rel="stylesheet" href="css/main.css" />
+    <link rel="stylesheet" href="css/add-on.css" />
+    <link rel="stylesheet" href="css/monokai-sublime.css">
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.min.js"></script>
+    <![endif]-->
+
+    <!-- Fav and touch icons -->
+    <!--<link rel="apple-touch-icon-precomposed" sizes="144x144" href="../assets/ico/apple-touch-icon-144-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../assets/ico/apple-touch-icon-114-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
+    <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">-->
+    <link rel="shortcut icon" href="img/favicon/favicon.png">
+  </head>
+  <body>
+     <!-- Wrapper -->
+        <div id="wrapper">
+
+<!-- Header -->
+<header id="header">
+            <h2><a href="https://blog.benelog.net/">개발수양록</a></h2>
+
+    <nav class="links">
+        <ul>
+        			<li>
+	                    <a href=" archive.html">
+	                       
+	                            <i class="fa fa-archive">&nbsp;</i>Archive
+	                        
+	                    </a>
+                	</li>
+        		
+        		 
+        			<li>
+	                    <a href=" about.html">
+	                       
+	                            <i class="fa fa-user">&nbsp;</i>About
+	                        
+	                    </a>
+                	</li>
+        		
+        		 
+        			<li>
+	                    <a href=" feed.xml">
+	                       
+	                            <i class="fa fa-rss">&nbsp;</i>Subscribe
+	                        
+	                    </a>
+                	</li>
+        		
+        		 
+        </ul>
+    </nav>
+    <nav class="main">
+        <ul>
+            <li class="search">
+                <a class="fa-search" href="#search">Search</a>
+                <form id="search" method="get" action="//google.com/search">
+                    <input type="text" name="q" placeholder="Search" />
+                    <input type="hidden" name="q" value="site:https://blog.benelog.net/">
+                </form>
+            </li>
+            <li class="menu">
+                <a class="fa-bars" href="#menu">Menu</a>
+            </li>
+        </ul>
+    </nav>
+</header>
+
+<!-- Menu -->
+<section id="menu">
+
+    <!-- Search -->
+        <section>
+            <form class="search" method="get" action="//google.com/search">
+                <input type="text" name="q" placeholder="Search" />
+                <input type="hidden" name="q" value="site:https://blog.benelog.net/">
+            </form>
+        </section>
+
+    <!-- Links -->
+        <section>
+            <ul class="links">
+        		 <li>
+                    <a href=" archive.html">
+                       
+                            <i class="fa fa-archive">&nbsp;</i>Archive
+                        
+                    </a>
+                </li>
+        		 <li>
+                    <a href=" about.html">
+                       
+                            <i class="fa fa-user">&nbsp;</i>About
+                        
+                    </a>
+                </li>
+        		 <li>
+                    <a href=" feed.xml">
+                       
+                            <i class="fa fa-rss">&nbsp;</i>Subscribe
+                        
+                    </a>
+                </li>
+            </ul>
+        </section>
+
+    <!-- Recent Posts -->
+        <section>
+            <ul class="links">
+                <header>
+                    <h3>Recent Posts</h3>
+                </header>
+                    <li>
+                        <a href="jackson-with-constructor.html"><p>Jackson으로 파싱한 JSON 속성값을 생성자로 전달하기</p></a>
+                    </li>
+                    <li>
+                        <a href="ktlint.html"><p>ktlint로 Kotlin 공식 코딩 컨벤션 맞추기</p></a>
+                    </li>
+                    <li>
+                        <a href="installing-jdk.html"><p>여러 개의 JDK를 설치하고 선택해서 사용하기</p></a>
+                    </li>
+                    <li>
+                        <a href="migration-to-static-site.html"><p>정적 사이트로 블로그 마이그레이션</p></a>
+                    </li>
+            </ul>
+        </section>
+
+    <!-- Actions -->
+        <!--
+        <section>
+            <ul class="actions vertical">
+                <li><a href="#" class="button big fit">Log In</a></li>
+            </ul>
+        </section>
+        -->
+</section>
+	<div id="main">
+<article class="post">
+   <header>
+    <div class="title">
+                    <h1><a href="jackson-with-constructor.html">Jackson으로 파싱한 JSON 속성값을 생성자로 전달하기</a></h1>
+
+            <p>Jackson으로 JSON을 파싱한 속성값을 객체의 생성자로 전달할 수 있는 여러가지 방법을 정리했습니다.</p>
+    </div>
+    <div class="meta">
+         <time class="published"
+            datetime='Mar 15, 2020'>
+            Mar 15, 2020</time>
+            <div class="published eta"></div>
+        <span class="author"/><span class="name">정상혁</span><img src="img/main/jsh.jpeg" alt="정상혁" /></span>
+    </div>
+</header>
+
+    
+  
+         
+    <div id="content">
+       <div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#jackson에서_no_creators_like_default_construct_exist_에러_메시지">1. Jackson에서 <code>(no Creators, like default construct, exist)</code> 에러 메시지</a></li>
+<li><a href="#생성자로_json_속성값을_전달하는_방법들">2. 생성자로 JSON 속성값을 전달하는 방법들</a>
+<ul class="sectlevel2">
+<li><a href="#jsoncreator">2.1. <code>@JsonCreator</code></a></li>
+<li><a href="#constructorproperties">2.2. <code>@ConstructorProperties</code></a></li>
+<li><a href="#parameternamemodule_활용">2.3. ParameterNameModule 활용</a></li>
+</ul>
+</li>
+<li><a href="#예제_소스_저장소">3. 예제 소스 저장소</a></li>
+</ul>
+</div>
+<div class="sect1">
+<h2 id="jackson에서_no_creators_like_default_construct_exist_에러_메시지">1. Jackson에서 <code>(no Creators, like default construct, exist)</code> 에러 메시지</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="title">파싱하고자하는 JSON</div>
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-json" data-lang="json">{
+    "accessDateTime": "2019-10-10T11:14:16Z",
+    "ip": "175.242.91.54",
+    "username": "benelog"
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>위와 같은 JSON을 파생해서 아래와 같이 setter가 없는 객체에 집어 넣고 싶은 경우가 있습니다.</p>
+</div>
+<div class="listingblock">
+<div class="title">파싱한 결과를 넣을 클래스</div>
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">public class AccessLog {
+    private final Instant accessDateTime;
+    private final String ip;
+    private final String username;
+
+    public AccessLog(Instant accessDateTime, String ip, String username) {
+        this.accessDateTime = accessDateTime;
+        this.ip = ip;
+        this.username = username;
+    }
+
+    public Instant getAccessDateTime() {
+        return accessDateTime;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Jackson 라이브러리로 JSON을 파싱하는 테스트 코드를 아래처럼 작성했습니다.</p>
+</div>
+<div class="listingblock">
+<div class="title">테스트 코드</div>
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">class ConstructorPropertiesTest {
+    @Test
+    void parse() throws JsonProcessingException {
+        var json = """
+            {
+            "accessDateTime": "2019-10-10T11:14:16Z",
+            "ip": "175.242.91.54",
+            "username": "benelog"
+            }
+            """;
+
+        var objectMapper = new ObjectMapper()
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+            .registerModule(new JavaTimeModule());
+
+        AccessLog accessLog = objectMapper.readValue(json, AccessLog.class);
+
+        then(accessLog.getAccessDateTime()).isEqualTo("2019-10-10T11:14:16Z");
+        then(accessLog.getIp()).isEqualTo("175.242.91.54");
+        then(accessLog.getUsername()).isEqualTo("benelog");;
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>위의 코드를 실행하면 다음의 Exception이 떨어집니다.
+<code>(no Creators, like default construct, exist)</code> 이 핵심적인 메시지입니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code>com.fasterxml.jackson.databind.exc.InvalidDefinitionException: Cannot construct instance of `net.benelog.jackson.ConstructorPropertiesTest$AccessLog` (no Creators, like default construct, exist): cannot deserialize from Object value (no delegate- or property-based Creator)
+ at [Source: (String)"{
+"accessDateTime": "2019-10-10T11:14:16Z",
+"ip": "175.242.91.54",
+"username": "benelog"
+}
+"; line: 2, column: 1]
+
+	at com.fasterxml.jackson.databind.exc.InvalidDefinitionException.from(InvalidDefinitionException.java:67)
+	at com.fasterxml.jackson.databind.DeserializationContext.reportBadDefinition(DeserializationContext.java:1592)
+	at com.fasterxml.jackson.databind.DeserializationContext.handleMissingInstantiator(DeserializationContext.java:1058)
+	at com.fasterxml.jackson.databind.deser.BeanDeserializerBase.deserializeFromObjectUsingNonDefault(BeanDeserializerBase.java:1297)
+	at com.fasterxml.jackson.databind.deser.BeanDeserializer.deserializeFromObject(BeanDeserializer.java:326)
+	at com.fasterxml.jackson.databind.deser.BeanDeserializer.deserialize(BeanDeserializer.java:159)
+	at com.fasterxml.jackson.databind.ObjectMapper._readMapAndClose(ObjectMapper.java:4218)
+	at com.fasterxml.jackson.databind.ObjectMapper.readValue(ObjectMapper.java:3214)
+	at com.fasterxml.jackson.databind.ObjectMapper.readValue(ObjectMapper.java:3182)</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>JSON을 파싱한 결과를 전달할 적절한 생성자를 찾지 못했을 때 발생하는 에러입니다.
+이 문제를 해결하기 위해 JSON 속성값을 전달받을 생성자를 지정하는 방법을 정리합니다.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="생성자로_json_속성값을_전달하는_방법들">2. 생성자로 JSON 속성값을 전달하는 방법들</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="jsoncreator">2.1. <code>@JsonCreator</code></h3>
+<div class="paragraph">
+<p>Jackson에서 제공하는 <code>@JsonCreator</code>, `@JsonProperty`를 값을 전달할 생성자와 메서드 파라미터에 붙입니다.</p>
+</div>
+<div class="listingblock">
+<div class="title">AccessLog의 생성자에 <code>@JsonCreator</code> 선언</div>
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public class AccessLog {
+
+    // 멤버 변수 선언 생략
+
+    @JsonCreator
+    public AccessLog(
+        @JsonProperty("accessDateTime") Instant accessDateTime,
+        @JsonProperty("ip") String ip,
+        @JsonProperty("username") String username) {
+
+        this.accessDateTime = accessDateTime;
+        this.ip = ip;
+        this.username = username;
+    }
+
+    // getter 생략
+}</code></pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>단점</p>
+<div class="ulist">
+<ul>
+<li>
+<p>JSON의 속성명과 객체의 멤버변수명이 다를 때도 자연스럽게 활용할 수 있습니다.</p>
+</li>
+<li>
+<p>생성자가 에러 개 일때 Jackson에서 사용할 생성자를 명시적으로 지정할 수 있습니다.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>단점</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Jackson에 의존적인 방법입니다.</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Jar파일로 배포하는 클래스 안에서 이 방법을 사용하려면 Jackson에 대한 의존성이 추가됩니다.</p>
+</li>
+<li>
+<p>JSON 파싱 라이브러리를 교체한다면 전체 클래스를 수정해야 합니다.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="constructorproperties">2.2. <code>@ConstructorProperties</code></h3>
+<div class="paragraph">
+<p>JDK 1.6부터 제공되었던 <code>@java.beans.ConstructorProperties</code> 은 생성자의 파라미터 이름을 지정하는 표준적인 방법입니다.
+이를 활용하면 생성자의 파라미터 이름을 Reflection API를 통해서 알 수 있습니다.
+Jackson은 2.7.0버전부터 <code>@ConstructorProperties</code> 를 인지합니다. ( <a href="https://github.com/fasterxml/jackson-databind/issues/905" class="bare">https://github.com/fasterxml/jackson-databind/issues/905</a> 참조)</p>
+</div>
+<div class="paragraph">
+<p>생성자에 <code>@ConstructorProperties</code> 으로 파라미터의 이름을 지정하면, Jackson에서는 동일한 이름의 JSON솔성값을 생성자로 넘겨줍니다.</p>
+</div>
+<div class="listingblock">
+<div class="title">AccessLog의 생성자에 `@ConstructorProperties`로 속성명 지정</div>
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">import java.beans.ConstructorProperties;
+
+public class AccessLog {
+
+    // 멤버 변수 선언 생략
+
+    @ConstructorProperties({"accessDateTime", "ip", "username"})
+    public AccessLog(Instant accessDateTime, String ip, String username) {
+        this.accessDateTime = accessDateTime;
+        this.ip = ip;
+        this.username = username;
+    }
+
+    // getter 생략
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Lombok을 활용한다면 이 과정을 더 편하게 할 수 있습니다.
+<code>lombok.config`를 다음과 같은 선언을 하면 Lombok에서 만드는 생성자에서 `@ConstructorProperties</code> 를 자동으로 넣어줍니다.</p>
+</div>
+<div class="listingblock">
+<div class="title">lombok.config 설정</div>
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-properties" data-lang="properties">lombok.anyConstructor.addConstructorProperties=true</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>@Builder</code>, <code>@AllArgsConstructor</code> 와 같은 애노테이션을 붙이면 Lombok에서는 생성자를 만들어줍니다.
+이를 통해 JSON 파싱한 값을 넣을 클래스를 더 단순하게 만들 수 이씁니다.</p>
+</div>
+<div class="listingblock">
+<div class="title">Lombok을 이용한 AccessLog 클래스 선언</div>
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">@Builder
+@Getter
+@ToString
+public class AccessLog {
+    private final Instant accessDateTime;
+    private final String ip;
+    private final String username;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>참고로 Lombok v1.16.20 전까지는 디폴트로 <code>@ConstructorProperties</code> 을 넣어줬었다고 합니다.
+이 이후 버전부터는 디폴트가 아니므로 <code>lombok.config</code> 에 명시적인 선언이 필요합니다.
+( <a href="https://multifrontgarden.tistory.com/222" class="bare">https://multifrontgarden.tistory.com/222</a> 참조 )</p>
+</div>
+<div class="paragraph">
+<p><code>@ConstructorProperties</code> 를 직접 쓸때의 장단점은 다음과 같다고 생각합니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>장점</p>
+<div class="ulist">
+<ul>
+<li>
+<p><code>@JsonCreator</code> + <code>@JsonProperties</code> 보다는 코딩량이 조금 적습니다.</p>
+</li>
+<li>
+<p>Jackson에 의존적이지 않습니다.</p>
+<div class="ulist">
+<ul>
+<li>
+<p>JSON을 파싱한 값이 들어가는 클래스를 jar 파일로 배포할 때 Jackson의 의존관계가 딸려들어가지 않습니다.</p>
+</li>
+<li>
+<p>같은 방식을 지원하는 다른 JSON 파싱 라이브러리로 교체할 때 코드 변경이 없습니다.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>단점</p>
+<div class="ulist">
+<ul>
+<li>
+<p>JSON의 속성명과 생성자의 실제 파라미터 명이 다른 경우에는 사용하는 것이 부자연스럽습니다.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>만약 아래와 같이 <code>@ConstructorProperties</code> 에서는 "ip_address"로 지정한 속성이 실제 파라미터이름이 <code>String ip</code> 경우라면, 코드로는 잘 동작하지만 애노테이션의 원래 의도하는 어긋난 것이 아닌가 하는 생각이 들었습니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-java" data-lang="java">    @ConstructorProperties({"accessDateTime", "ip_address", "username"})
+    public AccessLog(Instant accessDateTime, String ip, String username) {
+        this.accessDateTime = accessDateTime;
+        this.ip = ip;
+        this.username = username;
+    }</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>@ConstructorProperties</code> + Lombok 은 코드량이 적다는 장점이 있지만 멤버 변수의 이름이 JSON 속성명과 일치해야 한다는 단점도 있습니다.
+jar 파일로 배포하는 클래스라면 Lombok에 대한 의존성이 부담스러울수도 있습니다.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="parameternamemodule_활용">2.3. ParameterNameModule 활용</h3>
+<div class="paragraph">
+<p>앞의 예제들을 보면 <code>@JsonProperty("ip")</code> 와 같이 지정하는 속성의 이름과 생성자의 파라미터의 이름이 동일합니다.
+<code>String ip</code> 와 같이 생성자의 파라미터의 이름을 바로 가지고 올 수 있다면 일일히 속성명을 지정하지 않을 수 있겠다는 생각이 들만합니다.</p>
+</div>
+<div class="paragraph">
+<p>그런데 JDK 8이 나오기 전까지는 Reflection만으로는 파라미터 이름을 가지고 올 수 없었고, ASM과 같은 바이트코드 조작 라이브러리를 이용해서 디버깅을 위한 정보를 이용해야만 가능했습니다. ( <a href="https://stackoverflow.com/questions/2729580/how-to-get-the-parameter-names-of-an-objects-constructors-reflection#2729907" class="bare">https://stackoverflow.com/questions/2729580/how-to-get-the-parameter-names-of-an-objects-constructors-reflection#2729907</a> 참조) 그래서 앞서 소개한 <code>@java.beans.ConstructorProperties</code> 와 같은 애노테이션도 활용되었습니다.</p>
+</div>
+<div class="paragraph">
+<p>JDK8 이상에서는 컴파일을 할 때 <code>-parameters</code> 라는 옵션을 붙이면 Reflection API로 파라미터 정보를 가지고 올수 있도록 컴파일된 클래스에 정보를 덧붙여 줍니다.
+Gradle을 쓰고 있다면 아래와 같이 설정할 수 있습니다.</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle 안의 컴파일 옵션에 추가</div>
+<div class="content">
+<pre class="prettyprint highlight"><code>tasks.withType(JavaCompile).each {
+    it.options.compilerArgs.add('-parameters')
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>IDE 안에서도 컴파일 옵션을 신경써줘야합니다.</p>
+</div>
+<div class="paragraph">
+<p>IntelliJ에서는 <code>Settings</code> &gt; <code>Build, Execution, Development</code> &gt; <code>Build Tools</code> &gt; <code>Gradle</code> 에서 <code>Build and Run using:</code> 옵션을 확인해 봅니다.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="img/jackson/intellij-settings-gradle.png" alt="intellij-settings-gradle.png" title="Settings의 Gradle 설정"></span></p>
+</div>
+<div class="paragraph">
+<p>이 옵션값이 <code>Gradle(Default)`로 되어 있다면, `build.gradle</code> 의 컴파일 옵션이 그대로 쓰입니다.
+만약 그 값이 <code>IntelliJ IDEA</code> 로 되어 있다면 IntelliJ 안에서의 Java 컴파일 옵션도 동일하게 맞춰 줘야합니다.</p>
+</div>
+<div class="paragraph">
+<p><code>Settings</code> &gt; <code>Build, Execution, Development</code> &gt; <code>Compiler</code> &gt; <code>Java Compiler</code> 메뉴에서 <code>Addtional command line parameters</code> 옵션에 <code>-parameters</code> 을 적어줍니다.
+옵션을 바꾼 후에는 전체 프로젝트를 리빌드합니다.
+( <code>Build</code> &gt; <code>Rebuild Project</code> )</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="img/jackson/intellij-settings-java-compiler.png" alt="intellij-settings-java-compiler.png" title="Settings의 Java Compiler 설정"></span></p>
+</div>
+<div class="paragraph">
+<p>Jackson의 ParameterNameModule 을 쓰기 위해서는 다음과 같은 의존성 추가가 필요합니다.</p>
+</div>
+<div class="listingblock">
+<div class="title">ParameterNameModule 의존성 추가</div>
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-groovy" data-lang="groovy">    implementation 'com.fasterxml.jackson.module:jackson-module-parameter-names:2.10.3'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>ObjectMapper</code> 선언에서는 <code>registerModule</code> 메서드로 <code>ParameterNamesModule</code> 을 추가한다.</p>
+</div>
+<div class="listingblock">
+<div class="title">ObjectMapper에 ParameterNamesModule 선언 추가</div>
+<div class="content">
+<pre class="prettyprint highlight"><code class="language-ObjectMapper 선언" data-lang="ObjectMapper 선언">    var objectMapper = new ObjectMapper()
+        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+        .registerModule(new JavaTimeModule())
+        .registerModule(new ParameterNamesModule());</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>이렇게 하면 생성자에 특별한 애너테이션을 붙이지 않아도 Jackson은 JSON의 속성을 생성자에게 전달됩니다.</p>
+</div>
+<div class="paragraph">
+<p>Spring Boot에서는 <code>ParameterNamesModule</code> 을 편하게 쓸 수 있도록 아래와 같은 기본 설정이 제공됩니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Spring Boot Gradle Plugin에서 Java 컴파일의 <code>-parameters</code> 옵션이 자동 추가됩니다.</p>
+<div class="ulist">
+<ul>
+<li>
+<p>( <a href="https://github.com/spring-projects/spring-boot/blob/master/spring-boot-project/spring-boot-tools/spring-boot-gradle-plugin/src/main/java/org/springframework/boot/gradle/plugin/JavaPluginAction.java#L144">JavaPluginAction.java#L144</a> 참조 )</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>spring-boot-starter-web</code> 에서 이미 <code>jackson-module-parameter-names</code> 에 대한 의존성이 추가되어 있습니다.</p>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web/2.2.5.RELEASE">spring-boot-starter-web</a> &#8594; <a href="https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-json/2.2.5.RELEASE">spring-boot-starter-json</a> &#8594; <code>jackson-module-parameter-names</code> 로 의존관계가 연결됩니다.</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>디폴트로 등록되는 <code>ObjectMapper</code> bean에는 <code>ParameterNamesModule</code> 이 이미 추가되어 있습니다.</p>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://github.com/spring-projects/spring-boot/blob/33e414fcb2f04bec653f799228907a577ac27a10/spring-boot-project/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/jackson/JacksonAutoConfiguration.java#L108">JacksonAutoConfiguration.java#L108</a> 참조</p>
+</li>
+<li>
+<p><code>RestTeamplteBuilder</code> 로 RestTemplate을 생성한다면 디폴트 등록된 ObjectMapper 을 참조하는  <code>MappingJackson2HttpMessageConverter</code> 가 <code>RestTemplate</code> 에 주입됩니다.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="예제_소스_저장소">3. 예제 소스 저장소</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>예제는 <a href="https://github.com/benelog/jackson-expriment" class="bare">https://github.com/benelog/jackson-expriment</a> 에 올려두었습니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>@JsonCreator</code> 활용 : <a href="$https://github.com/benelog/jackson-expriment/tree/master/src/test/java/net/benelog/jackson/JsonCreatorTest.java">JsonCreatorTest.java</a></p>
+</li>
+<li>
+<p><code>@ConstructorProperties</code> 활용 : <a href="$https://github.com/benelog/jackson-expriment/tree/master/src/test/java/net/benelog/jackson/ConstructorPropertiesTest.java">ConstructorPropertiesTest.java</a></p>
+<div class="ulist">
+<ul>
+<li>
+<p>+ Lombok : <a href="$https://github.com/benelog/jackson-expriment/tree/master/src/test/java/net/benelog/jackson/LombokTest.java">LombokTest.java</a>, <a href="lombok.config">lombok.config</a></p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>ParameterNameModule</code> 활용 : <a href="$https://github.com/benelog/jackson-expriment/tree/master/src/test/java/net/benelog/jackson/ParameterNameModuleTest.java">ParameterNameModuleTest.java</a>, <a href="$https://github.com/benelog/jackson-expriment/tree/master/build.gradle#L28">build.gradle</a></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Text blocks 문법을 활용하려고 JDK 13을 쓴 예제입니다.
+InteliJ 안에서 경고가 뜬다면 'Set Language level to 13(Preview)' 를 선택해줍니다.</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="img/jackson/text-blocks.png" alt="text-blocks.png" title="Text Block"></span></p>
+</div>
+</div>
+</div>
+    </div>
+	
+	<section id="social-share">
+        <ul class="icons">
+<!-- Social Share Button HTML -->
+
+<!-- Twitter -->
+<li><a href="//twitter.com/share?url=https://blog.benelog.net//jackson-with-constructor.html&text=Jackson으로 파싱한 JSON 속성값을 생성자로 전달하기&via=" target="_blank" class="share-btn twitter">
+    <i class="fa fa-twitter"></i>
+    <p>Twitter</p>
+</a></li>
+
+<!-- Google Plus -->
+<li><a href="//plus.google.com/share?url=https://blog.benelog.net//jackson-with-constructor.html" target="_blank" class="share-btn google-plus">
+    <i class="fa fa-google-plus"></i>
+    <p>Google+</p>
+</a></li>
+
+<!-- Facebook -->
+<li><a href="//www.facebook.com/sharer/sharer.php?u=https://blog.benelog.net//jackson-with-constructor.html" target="_blank" class="share-btn facebook">
+    <i class="fa fa-facebook"></i>
+    <p>Facebook</p>
+</a></li>
+
+<!-- Reddit (url, title) -->
+<li><a href="//reddit.com/submit?url=https://blog.benelog.net//jackson-with-constructor.html&title=Jackson으로 파싱한 JSON 속성값을 생성자로 전달하기" target="_blank" class="share-btn reddit">
+    <i class="fa fa-reddit-alien"></i>
+    <p>Reddit</p>
+</a></li>
+
+<!-- LinkedIn -->
+<li><a href="//www.linkedin.com/shareArticle?url=https://blog.benelog.net//jackson-with-constructor.html&title=Jackson으로 파싱한 JSON 속성값을 생성자로 전달하기" target="_blank" class="share-btn linkedin">
+    <i class="fa fa-linkedin"></i>
+    <p>LinkedIn</p>
+</a></li>
+
+<!-- StumbleUpon (url, title) -->
+<li><a href="//www.stumbleupon.com/submit?url=https://blog.benelog.net//jackson-with-constructor.html&title=Jackson으로 파싱한 JSON 속성값을 생성자로 전달하기" target="_blank" class="share-btn stumbleupon">
+    <i class="fa fa-stumbleupon"></i>
+    <p>StumbleUpon</p>
+</a></li>
+
+<!-- Email -->
+<li><a href="mailto:?subject=Check out this post by 정상혁&body=https://blog.benelog.net//jackson-with-constructor.html" target="_blank" class="share-btn email">
+    <i class="fa fa-envelope"></i>
+    <p>Email</p>
+</a></li>
+        </ul>
+    </section>
+     
+
+    <footer>
+	
+		<ul class="stats">
+    	    <!-- Display the categories associated with this post -->
+    	    <li><i class="fa fa-tags">&nbsp;</i>  Tags: </li>
+ 	        <li><a href='tags/jackson.html'>jackson</a></li>
+ 	        <li><a href='tags/java.html'>java</a></li>
+
+				<li><a class="icon fa-comment" href="jackson-with-constructor.html#disqus_thread"> &nbsp;</a></li>
+ 		</ul>
+    	
+    </footer>
+</article>
+		
+<ul class="actions pagination">
+  	
+  		        <li><a href="ktlint.html" 
+                class="button big previous">ktlint로 Kotlin 공식 코딩 컨벤션 맞추기</a></li>
+	
+</ul>
+		
+<div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+    var disqus_config = function () {
+      this.page.identifier = 'jackson-with-constructor.html';
+    };
+    var disqus_shortname = 'blog-benelog';
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        dsq.setAttribute('data-timestamp', + new Date());
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <!--<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>-->
+</div>
+    </div>
+
+<!-- Sidebar -->
+<section id="sidebar">
+
+    <!-- Intro -->
+        <section id="intro">
+                                    <a href="/" class="logo"><img src="img/main/intro.jpg" class="intro-circle" width="150px" alt="benelog" /></a>
+
+
+                <header>
+                    <h2>개발 수양록</h2>
+                    <p>S/W 개발에 관한 정상혁의 글 모음</p>
+                </header>
+
+            <ul class="icons">
+                    <li><a href="feed.xml" type="application/rss+xml"
+                        target="_blank" title="RSS" class="fa fa-rss"></a></li>
+<li><a href="//github.com/benelog" target="_blank" title="GitHub" class="fa fa-github"></a></li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<li><a href="//benelog.tumblr.com" target="_blank" title="Tumblr" class="fa fa-tumblr"></a></li>
+
+
+<li><a href="//linkedin.com/in/sanghyukjung" target="_blank" title="LinkedIn" class="fa fa-linkedin"></a></li>
+
+<li><a href="//slideshare.com/benelog" target="_blank" title="SlideShare" class="fa fa-slideshare"></a></li>
+
+
+
+
+
+<li><a href="//facebook.com/benelog" target="_blank" title="Facebook" class="fa fa-facebook"></a></li>
+
+
+            </ul>
+        </section>
+
+    <!-- Posts List -->
+        <section id="recent-posts">
+            <ul class="posts">
+                <header>
+                    <h3>Recent Posts</h3>
+                </header>
+
+                    <li>
+                        <article>
+                            <header>
+                                <h3><a href="jackson-with-constructor.html">Jackson으로 파싱한 JSON 속성값을 생성자로 전달하기</a></h3>
+                                 <time class="published"
+							            datetime='Mar 15, 2020'>
+							            Mar 15, 2020</time>
+                            </header>
+                        </article>
+                    </li>
+
+                    <li>
+                        <article>
+                            <header>
+                                <h3><a href="ktlint.html">ktlint로 Kotlin 공식 코딩 컨벤션 맞추기</a></h3>
+                                 <time class="published"
+							            datetime='Nov 12, 2019'>
+							            Nov 12, 2019</time>
+                            </header>
+                        </article>
+                    </li>
+
+                    <li>
+                        <article>
+                            <header>
+                                <h3><a href="installing-jdk.html">여러 개의 JDK를 설치하고 선택해서 사용하기</a></h3>
+                                 <time class="published"
+							            datetime='Jul 01, 2019'>
+							            Jul 01, 2019</time>
+                            </header>
+                        </article>
+                    </li>
+
+                    <li>
+                        <article>
+                            <header>
+                                <h3><a href="migration-to-static-site.html">정적 사이트로 블로그 마이그레이션</a></h3>
+                                 <time class="published"
+							            datetime='May 06, 2019'>
+							            May 06, 2019</time>
+                            </header>
+                        </article>
+                    </li>
+
+
+                    <li>
+                        <ul class="actions">
+                            <li><a href="archive.html"
+                            class="button">View more posts</a></li>
+                        </ul>
+                    </li>
+            </ul>
+        </section>
+
+    <!-- Tags List can be show/hide from config-->
+        <section id="tags">
+            <ul class="posts">
+                <header>
+                    <h3>Tags</h3>
+                </header>
+
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/.html"></a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 2 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/exception.html">exception</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 2 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/양병규.html">양병규</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/Maven.html">Maven</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 6 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/Multiline.html">Multiline</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/Eclipse.html">Eclipse</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 7 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/Naver.html">Naver</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 2 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/HTML.html">HTML</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/String.html">String</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/mashup도구.html">mashup도구</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/성능.html">성능</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/Cubrid.html">Cubrid</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/Cron.html">Cron</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 2 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/Lotto.html">Lotto</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 3 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/행사후기.html">행사후기</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 9 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/cloud.html">cloud</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/BeanUtils.html">BeanUtils</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/Spring-Batch.html">Spring-Batch</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 4 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/java.html">java</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 3 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/generics.html">generics</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/개발.html">개발</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/Test.html">Test</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 7 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/Concurrency.html">Concurrency</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/MyBatis.html">MyBatis</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/coding-convention.html">coding-convention</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 2 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/EMMA.html">EMMA</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/Winstone.html">Winstone</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/Python.html">Python</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/Google.html">Google</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/반복문.html">반복문</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/JSTL.html">JSTL</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/autoboxing.html">autoboxing</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/test.html">test</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 8 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/코딩연습.html">코딩연습</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 10 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/뉴스.html">뉴스</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 5 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/Hudson.html">Hudson</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 4 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/Hadoop.html">Hadoop</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/testing.html">testing</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/batch.html">batch</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/시간대.html">시간대</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/날짜.html">날짜</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 2 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/Spring.html">Spring</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 18 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/Sybase.html">Sybase</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 2 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/open-API.html">open-API</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/FindBugs.html">FindBugs</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/SQL.html">SQL</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/Android.html">Android</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 3 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/Spring-Integration.html">Spring-Integration</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/dropbox.html">dropbox</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/effective-Java.html">effective-Java</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/Spring-Test.html">Spring-Test</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 8 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/spiral-array.html">spiral-array</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 2 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/PowerMock.html">PowerMock</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/FTP.html">FTP</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/보안.html">보안</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/책.html">책</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 5 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/timezone.html">timezone</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/ktlint.html">ktlint</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/android.html">android</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/꿈.html">꿈</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/mashup.html">mashup</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/WAS.html">WAS</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/Spring-One.html">Spring-One</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 5 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/DependencyInjection.html">DependencyInjection</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/static-site.html">static-site</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/Effective-java.html">Effective-java</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/reload.html">reload</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/자작도구.html">자작도구</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 4 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/git.html">git</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/jackson.html">jackson</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/JUnit.html">JUnit</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/markdown.html">markdown</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/JDBC.html">JDBC</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 4 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/Servlet.html">Servlet</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/검색.html">검색</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/Oracle.html">Oracle</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/Monitoring.html">Monitoring</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/정적분석.html">정적분석</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 5 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/Java.html">Java</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 14 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/CSS.html">CSS</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 2 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/AOP.html">AOP</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 3 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/PMD.html">PMD</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 2 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/생산성-도구.html">생산성-도구</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/kotlin.html">kotlin</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/svn.html">svn</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/Robolectric.html">Robolectric</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/매쉬업.html">매쉬업</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/Spring-MVC.html">Spring-MVC</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/jdk.html">jdk</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/Spring-JDBC.html">Spring-JDBC</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/Btrace.html">Btrace</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/변수범위.html">변수범위</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/XML.html">XML</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 2 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/Jetty.html">Jetty</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+                    <li>
+                        <article>
+                            <header>
+                                <a href="tags/발명.html">발명</a>
+                                <!-- JBake 2.5.1 Issue#357 prevents accessing db, If you are using 2.5.1 or earlier comment below SPAN element. -->
+                                <span style="float:right;"> 1 </span>
+                            </header>
+                        </article>
+                    </li>
+            </ul>
+        </section>
+
+
+    <!-- About -->
+        <section class="blurb">
+            <h2>About</h2>
+            <p>introduce</p>
+
+            <ul class="actions">
+                <li><a href="about.html" class="button">Learn More</a></li>
+            </ul>
+        </section>
+
+
+        <section id="footer">
+            <p class="copyright">&copy; 개발수양록. Design: <a href="http://html5up.net" target="_blank">HTML5 UP</a>. Ported For SSG by <a href="https://github.com/jpescador/hugo-future-imperfect">Julio Pescador</a>. Adapted to JBake by <a href="//github.com/manikmagar" target="_blank">Manik Magar</a>. Baked with <a href="http://jbake.org">JBake v2.6.4</a>.
+            <a href="/sitemap.xml" target="_blank">Sitemap</a>.</p>
+        </section>
+
+</section>
+		</div>
+		<a id="back-to-top" href="#" class="fa fa-arrow-up fa-border fa-2x"></a>
+		<div id="push"></div>
+    </div>
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+
+		<script src="js/jquery.min.js"></script>
+		<script src="js/skel.min.js"></script>
+		<script src="js/util.js"></script>
+		<script src="js/main.js"></script>
+		<script src="js/backToTop.js"></script>
+		<script src="js/highlight.pack.js"></script>
+		<script src="js/readingTime.js"></script>
+
+			<script id="dsq-count-scr" src="//blog-benelog.disqus.com/count.js" async></script>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-138559685-1', 'auto');
+  ga('send', 'pageview', {
+    'page': 'jackson-with-constructor.html',
+    'title': 'Jackson으로 파싱한 JSON 속성값을 생성자로 전달하기'
+      });
+</script>
+		<!-- This is called by default since this theme uses highlight.js -->
+		<script>hljs.initHighlightingOnLoad();</script>
+		<!--[if lte IE 8]><script src="/js/ie/respond.min.js"></script><![endif]-->
+
+  </body>
+</html>

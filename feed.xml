@@ -6,9 +6,471 @@
     <atom:link href="https://blog.benelog.net//feed.xml" rel="self" type="application/rss+xml" />
     <description>JBake Bootstrap Template</description>
     <language>en-gb</language>
-    <pubDate>Fri, 20 Dec 2019 02:22:24 +0000</pubDate>
-    <lastBuildDate>Fri, 20 Dec 2019 02:22:24 +0000</lastBuildDate>
+    <pubDate>Mon, 16 Mar 2020 00:15:13 +0000</pubDate>
+    <lastBuildDate>Mon, 16 Mar 2020 00:15:13 +0000</lastBuildDate>
 
+    <item>
+      <title>Jackson으로 파싱한 JSON 속성값을 생성자로 전달하기</title>
+      <link>https://blog.benelog.net//jackson-with-constructor.html</link>
+      <pubDate>Sun, 15 Mar 2020 00:00:00 +0000</pubDate>
+      <guid isPermaLink="false">jackson-with-constructor.html</guid>
+      	<description>
+	&lt;div id=&quot;toc&quot; class=&quot;toc&quot;&gt;
+&lt;div id=&quot;toctitle&quot;&gt;Table of Contents&lt;/div&gt;
+&lt;ul class=&quot;sectlevel1&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#jackson에서_no_creators_like_default_construct_exist_에러_메시지&quot;&gt;1. Jackson에서 &lt;code&gt;(no Creators, like default construct, exist)&lt;/code&gt; 에러 메시지&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#생성자로_json_속성값을_전달하는_방법들&quot;&gt;2. 생성자로 JSON 속성값을 전달하는 방법들&lt;/a&gt;
+&lt;ul class=&quot;sectlevel2&quot;&gt;
+&lt;li&gt;&lt;a href=&quot;#jsoncreator&quot;&gt;2.1. &lt;code&gt;@JsonCreator&lt;/code&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#constructorproperties&quot;&gt;2.2. &lt;code&gt;@ConstructorProperties&lt;/code&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#parameternamemodule_활용&quot;&gt;2.3. ParameterNameModule 활용&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;#예제_소스_저장소&quot;&gt;3. 예제 소스 저장소&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;jackson에서_no_creators_like_default_construct_exist_에러_메시지&quot;&gt;1. Jackson에서 &lt;code&gt;(no Creators, like default construct, exist)&lt;/code&gt; 에러 메시지&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;파싱하고자하는 JSON&lt;/div&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;prettyprint highlight&quot;&gt;&lt;code class=&quot;language-json&quot; data-lang=&quot;json&quot;&gt;{
+    &quot;accessDateTime&quot;: &quot;2019-10-10T11:14:16Z&quot;,
+    &quot;ip&quot;: &quot;175.242.91.54&quot;,
+    &quot;username&quot;: &quot;benelog&quot;
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;위와 같은 JSON을 파생해서 아래와 같이 setter가 없는 객체에 집어 넣고 싶은 경우가 있습니다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;파싱한 결과를 넣을 클래스&lt;/div&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;prettyprint highlight&quot;&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;public class AccessLog {
+    private final Instant accessDateTime;
+    private final String ip;
+    private final String username;
+
+    public AccessLog(Instant accessDateTime, String ip, String username) {
+        this.accessDateTime = accessDateTime;
+        this.ip = ip;
+        this.username = username;
+    }
+
+    public Instant getAccessDateTime() {
+        return accessDateTime;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Jackson 라이브러리로 JSON을 파싱하는 테스트 코드를 아래처럼 작성했습니다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;테스트 코드&lt;/div&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;prettyprint highlight&quot;&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;class ConstructorPropertiesTest {
+    @Test
+    void parse() throws JsonProcessingException {
+        var json = &quot;&quot;&quot;
+            {
+            &quot;accessDateTime&quot;: &quot;2019-10-10T11:14:16Z&quot;,
+            &quot;ip&quot;: &quot;175.242.91.54&quot;,
+            &quot;username&quot;: &quot;benelog&quot;
+            }
+            &quot;&quot;&quot;;
+
+        var objectMapper = new ObjectMapper()
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+            .registerModule(new JavaTimeModule());
+
+        AccessLog accessLog = objectMapper.readValue(json, AccessLog.class);
+
+        then(accessLog.getAccessDateTime()).isEqualTo(&quot;2019-10-10T11:14:16Z&quot;);
+        then(accessLog.getIp()).isEqualTo(&quot;175.242.91.54&quot;);
+        then(accessLog.getUsername()).isEqualTo(&quot;benelog&quot;);;
+    }
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;위의 코드를 실행하면 다음의 Exception이 떨어집니다.
+&lt;code&gt;(no Creators, like default construct, exist)&lt;/code&gt; 이 핵심적인 메시지입니다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;prettyprint highlight&quot;&gt;&lt;code&gt;com.fasterxml.jackson.databind.exc.InvalidDefinitionException: Cannot construct instance of `net.benelog.jackson.ConstructorPropertiesTest$AccessLog` (no Creators, like default construct, exist): cannot deserialize from Object value (no delegate- or property-based Creator)
+ at [Source: (String)&quot;{
+&quot;accessDateTime&quot;: &quot;2019-10-10T11:14:16Z&quot;,
+&quot;ip&quot;: &quot;175.242.91.54&quot;,
+&quot;username&quot;: &quot;benelog&quot;
+}
+&quot;; line: 2, column: 1]
+
+	at com.fasterxml.jackson.databind.exc.InvalidDefinitionException.from(InvalidDefinitionException.java:67)
+	at com.fasterxml.jackson.databind.DeserializationContext.reportBadDefinition(DeserializationContext.java:1592)
+	at com.fasterxml.jackson.databind.DeserializationContext.handleMissingInstantiator(DeserializationContext.java:1058)
+	at com.fasterxml.jackson.databind.deser.BeanDeserializerBase.deserializeFromObjectUsingNonDefault(BeanDeserializerBase.java:1297)
+	at com.fasterxml.jackson.databind.deser.BeanDeserializer.deserializeFromObject(BeanDeserializer.java:326)
+	at com.fasterxml.jackson.databind.deser.BeanDeserializer.deserialize(BeanDeserializer.java:159)
+	at com.fasterxml.jackson.databind.ObjectMapper._readMapAndClose(ObjectMapper.java:4218)
+	at com.fasterxml.jackson.databind.ObjectMapper.readValue(ObjectMapper.java:3214)
+	at com.fasterxml.jackson.databind.ObjectMapper.readValue(ObjectMapper.java:3182)&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;JSON을 파싱한 결과를 전달할 적절한 생성자를 찾지 못했을 때 발생하는 에러입니다.
+이 문제를 해결하기 위해 JSON 속성값을 전달받을 생성자를 지정하는 방법을 정리합니다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;생성자로_json_속성값을_전달하는_방법들&quot;&gt;2. 생성자로 JSON 속성값을 전달하는 방법들&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;jsoncreator&quot;&gt;2.1. &lt;code&gt;@JsonCreator&lt;/code&gt;&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Jackson에서 제공하는 &lt;code&gt;@JsonCreator&lt;/code&gt;, `@JsonProperty`를 값을 전달할 생성자와 메서드 파라미터에 붙입니다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;AccessLog의 생성자에 &lt;code&gt;@JsonCreator&lt;/code&gt; 선언&lt;/div&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;prettyprint highlight&quot;&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public class AccessLog {
+
+    // 멤버 변수 선언 생략
+
+    @JsonCreator
+    public AccessLog(
+        @JsonProperty(&quot;accessDateTime&quot;) Instant accessDateTime,
+        @JsonProperty(&quot;ip&quot;) String ip,
+        @JsonProperty(&quot;username&quot;) String username) {
+
+        this.accessDateTime = accessDateTime;
+        this.ip = ip;
+        this.username = username;
+    }
+
+    // getter 생략
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;단점&lt;/p&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;JSON의 속성명과 객체의 멤버변수명이 다를 때도 자연스럽게 활용할 수 있습니다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;생성자가 에러 개 일때 Jackson에서 사용할 생성자를 명시적으로 지정할 수 있습니다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;단점&lt;/p&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Jackson에 의존적인 방법입니다.&lt;/p&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Jar파일로 배포하는 클래스 안에서 이 방법을 사용하려면 Jackson에 대한 의존성이 추가됩니다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;JSON 파싱 라이브러리를 교체한다면 전체 클래스를 수정해야 합니다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;constructorproperties&quot;&gt;2.2. &lt;code&gt;@ConstructorProperties&lt;/code&gt;&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;JDK 1.6부터 제공되었던 &lt;code&gt;@java.beans.ConstructorProperties&lt;/code&gt; 은 생성자의 파라미터 이름을 지정하는 표준적인 방법입니다.
+이를 활용하면 생성자의 파라미터 이름을 Reflection API를 통해서 알 수 있습니다.
+Jackson은 2.7.0버전부터 &lt;code&gt;@ConstructorProperties&lt;/code&gt; 를 인지합니다. ( &lt;a href=&quot;https://github.com/fasterxml/jackson-databind/issues/905&quot; class=&quot;bare&quot;&gt;https://github.com/fasterxml/jackson-databind/issues/905&lt;/a&gt; 참조)&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;생성자에 &lt;code&gt;@ConstructorProperties&lt;/code&gt; 으로 파라미터의 이름을 지정하면, Jackson에서는 동일한 이름의 JSON솔성값을 생성자로 넘겨줍니다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;AccessLog의 생성자에 `@ConstructorProperties`로 속성명 지정&lt;/div&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;prettyprint highlight&quot;&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;import java.beans.ConstructorProperties;
+
+public class AccessLog {
+
+    // 멤버 변수 선언 생략
+
+    @ConstructorProperties({&quot;accessDateTime&quot;, &quot;ip&quot;, &quot;username&quot;})
+    public AccessLog(Instant accessDateTime, String ip, String username) {
+        this.accessDateTime = accessDateTime;
+        this.ip = ip;
+        this.username = username;
+    }
+
+    // getter 생략
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Lombok을 활용한다면 이 과정을 더 편하게 할 수 있습니다.
+&lt;code&gt;lombok.config`를 다음과 같은 선언을 하면 Lombok에서 만드는 생성자에서 `@ConstructorProperties&lt;/code&gt; 를 자동으로 넣어줍니다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;lombok.config 설정&lt;/div&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;prettyprint highlight&quot;&gt;&lt;code class=&quot;language-properties&quot; data-lang=&quot;properties&quot;&gt;lombok.anyConstructor.addConstructorProperties=true&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;&lt;code&gt;@Builder&lt;/code&gt;, &lt;code&gt;@AllArgsConstructor&lt;/code&gt; 와 같은 애노테이션을 붙이면 Lombok에서는 생성자를 만들어줍니다.
+이를 통해 JSON 파싱한 값을 넣을 클래스를 더 단순하게 만들 수 이씁니다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;Lombok을 이용한 AccessLog 클래스 선언&lt;/div&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;prettyprint highlight&quot;&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;@Builder
+@Getter
+@ToString
+public class AccessLog {
+    private final Instant accessDateTime;
+    private final String ip;
+    private final String username;
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;참고로 Lombok v1.16.20 전까지는 디폴트로 &lt;code&gt;@ConstructorProperties&lt;/code&gt; 을 넣어줬었다고 합니다.
+이 이후 버전부터는 디폴트가 아니므로 &lt;code&gt;lombok.config&lt;/code&gt; 에 명시적인 선언이 필요합니다.
+( &lt;a href=&quot;https://multifrontgarden.tistory.com/222&quot; class=&quot;bare&quot;&gt;https://multifrontgarden.tistory.com/222&lt;/a&gt; 참조 )&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;&lt;code&gt;@ConstructorProperties&lt;/code&gt; 를 직접 쓸때의 장단점은 다음과 같다고 생각합니다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;장점&lt;/p&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;@JsonCreator&lt;/code&gt; + &lt;code&gt;@JsonProperties&lt;/code&gt; 보다는 코딩량이 조금 적습니다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Jackson에 의존적이지 않습니다.&lt;/p&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;JSON을 파싱한 값이 들어가는 클래스를 jar 파일로 배포할 때 Jackson의 의존관계가 딸려들어가지 않습니다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;같은 방식을 지원하는 다른 JSON 파싱 라이브러리로 교체할 때 코드 변경이 없습니다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;단점&lt;/p&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;JSON의 속성명과 생성자의 실제 파라미터 명이 다른 경우에는 사용하는 것이 부자연스럽습니다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;만약 아래와 같이 &lt;code&gt;@ConstructorProperties&lt;/code&gt; 에서는 &quot;ip_address&quot;로 지정한 속성이 실제 파라미터이름이 &lt;code&gt;String ip&lt;/code&gt; 경우라면, 코드로는 잘 동작하지만 애노테이션의 원래 의도하는 어긋난 것이 아닌가 하는 생각이 들었습니다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;prettyprint highlight&quot;&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;    @ConstructorProperties({&quot;accessDateTime&quot;, &quot;ip_address&quot;, &quot;username&quot;})
+    public AccessLog(Instant accessDateTime, String ip, String username) {
+        this.accessDateTime = accessDateTime;
+        this.ip = ip;
+        this.username = username;
+    }&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;&lt;code&gt;@ConstructorProperties&lt;/code&gt; + Lombok 은 코드량이 적다는 장점이 있지만 멤버 변수의 이름이 JSON 속성명과 일치해야 한다는 단점도 있습니다.
+jar 파일로 배포하는 클래스라면 Lombok에 대한 의존성이 부담스러울수도 있습니다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect2&quot;&gt;
+&lt;h3 id=&quot;parameternamemodule_활용&quot;&gt;2.3. ParameterNameModule 활용&lt;/h3&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;앞의 예제들을 보면 &lt;code&gt;@JsonProperty(&quot;ip&quot;)&lt;/code&gt; 와 같이 지정하는 속성의 이름과 생성자의 파라미터의 이름이 동일합니다.
+&lt;code&gt;String ip&lt;/code&gt; 와 같이 생성자의 파라미터의 이름을 바로 가지고 올 수 있다면 일일히 속성명을 지정하지 않을 수 있겠다는 생각이 들만합니다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;그런데 JDK 8이 나오기 전까지는 Reflection만으로는 파라미터 이름을 가지고 올 수 없었고, ASM과 같은 바이트코드 조작 라이브러리를 이용해서 디버깅을 위한 정보를 이용해야만 가능했습니다. ( &lt;a href=&quot;https://stackoverflow.com/questions/2729580/how-to-get-the-parameter-names-of-an-objects-constructors-reflection#2729907&quot; class=&quot;bare&quot;&gt;https://stackoverflow.com/questions/2729580/how-to-get-the-parameter-names-of-an-objects-constructors-reflection#2729907&lt;/a&gt; 참조) 그래서 앞서 소개한 &lt;code&gt;@java.beans.ConstructorProperties&lt;/code&gt; 와 같은 애노테이션도 활용되었습니다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;JDK8 이상에서는 컴파일을 할 때 &lt;code&gt;-parameters&lt;/code&gt; 라는 옵션을 붙이면 Reflection API로 파라미터 정보를 가지고 올수 있도록 컴파일된 클래스에 정보를 덧붙여 줍니다.
+Gradle을 쓰고 있다면 아래와 같이 설정할 수 있습니다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;build.gradle 안의 컴파일 옵션에 추가&lt;/div&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;prettyprint highlight&quot;&gt;&lt;code&gt;tasks.withType(JavaCompile).each {
+    it.options.compilerArgs.add(&apos;-parameters&apos;)
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;IDE 안에서도 컴파일 옵션을 신경써줘야합니다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;IntelliJ에서는 &lt;code&gt;Settings&lt;/code&gt; &amp;gt; &lt;code&gt;Build, Execution, Development&lt;/code&gt; &amp;gt; &lt;code&gt;Build Tools&lt;/code&gt; &amp;gt; &lt;code&gt;Gradle&lt;/code&gt; 에서 &lt;code&gt;Build and Run using:&lt;/code&gt; 옵션을 확인해 봅니다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;&lt;span class=&quot;image&quot;&gt;&lt;img src=&quot;img/jackson/intellij-settings-gradle.png&quot; alt=&quot;intellij-settings-gradle.png&quot; title=&quot;Settings의 Gradle 설정&quot;&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;이 옵션값이 &lt;code&gt;Gradle(Default)`로 되어 있다면, `build.gradle&lt;/code&gt; 의 컴파일 옵션이 그대로 쓰입니다.
+만약 그 값이 &lt;code&gt;IntelliJ IDEA&lt;/code&gt; 로 되어 있다면 IntelliJ 안에서의 Java 컴파일 옵션도 동일하게 맞춰 줘야합니다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;&lt;code&gt;Settings&lt;/code&gt; &amp;gt; &lt;code&gt;Build, Execution, Development&lt;/code&gt; &amp;gt; &lt;code&gt;Compiler&lt;/code&gt; &amp;gt; &lt;code&gt;Java Compiler&lt;/code&gt; 메뉴에서 &lt;code&gt;Addtional command line parameters&lt;/code&gt; 옵션에 &lt;code&gt;-parameters&lt;/code&gt; 을 적어줍니다.
+옵션을 바꾼 후에는 전체 프로젝트를 리빌드합니다.
+( &lt;code&gt;Build&lt;/code&gt; &amp;gt; &lt;code&gt;Rebuild Project&lt;/code&gt; )&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;&lt;span class=&quot;image&quot;&gt;&lt;img src=&quot;img/jackson/intellij-settings-java-compiler.png&quot; alt=&quot;intellij-settings-java-compiler.png&quot; title=&quot;Settings의 Java Compiler 설정&quot;&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Jackson의 ParameterNameModule 을 쓰기 위해서는 다음과 같은 의존성 추가가 필요합니다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;ParameterNameModule 의존성 추가&lt;/div&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;prettyprint highlight&quot;&gt;&lt;code class=&quot;language-groovy&quot; data-lang=&quot;groovy&quot;&gt;    implementation &apos;com.fasterxml.jackson.module:jackson-module-parameter-names:2.10.3&apos;&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;&lt;code&gt;ObjectMapper&lt;/code&gt; 선언에서는 &lt;code&gt;registerModule&lt;/code&gt; 메서드로 &lt;code&gt;ParameterNamesModule&lt;/code&gt; 을 추가한다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;title&quot;&gt;ObjectMapper에 ParameterNamesModule 선언 추가&lt;/div&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre class=&quot;prettyprint highlight&quot;&gt;&lt;code class=&quot;language-ObjectMapper 선언&quot; data-lang=&quot;ObjectMapper 선언&quot;&gt;    var objectMapper = new ObjectMapper()
+        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+        .registerModule(new JavaTimeModule())
+        .registerModule(new ParameterNamesModule());&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;이렇게 하면 생성자에 특별한 애너테이션을 붙이지 않아도 Jackson은 JSON의 속성을 생성자에게 전달됩니다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Spring Boot에서는 &lt;code&gt;ParameterNamesModule&lt;/code&gt; 을 편하게 쓸 수 있도록 아래와 같은 기본 설정이 제공됩니다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Spring Boot Gradle Plugin에서 Java 컴파일의 &lt;code&gt;-parameters&lt;/code&gt; 옵션이 자동 추가됩니다.&lt;/p&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;( &lt;a href=&quot;https://github.com/spring-projects/spring-boot/blob/master/spring-boot-project/spring-boot-tools/spring-boot-gradle-plugin/src/main/java/org/springframework/boot/gradle/plugin/JavaPluginAction.java#L144&quot;&gt;JavaPluginAction.java#L144&lt;/a&gt; 참조 )&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;spring-boot-starter-web&lt;/code&gt; 에서 이미 &lt;code&gt;jackson-module-parameter-names&lt;/code&gt; 에 대한 의존성이 추가되어 있습니다.&lt;/p&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web/2.2.5.RELEASE&quot;&gt;spring-boot-starter-web&lt;/a&gt; &amp;#8594; &lt;a href=&quot;https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-json/2.2.5.RELEASE&quot;&gt;spring-boot-starter-json&lt;/a&gt; &amp;#8594; &lt;code&gt;jackson-module-parameter-names&lt;/code&gt; 로 의존관계가 연결됩니다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;디폴트로 등록되는 &lt;code&gt;ObjectMapper&lt;/code&gt; bean에는 &lt;code&gt;ParameterNamesModule&lt;/code&gt; 이 이미 추가되어 있습니다.&lt;/p&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;a href=&quot;https://github.com/spring-projects/spring-boot/blob/33e414fcb2f04bec653f799228907a577ac27a10/spring-boot-project/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/jackson/JacksonAutoConfiguration.java#L108&quot;&gt;JacksonAutoConfiguration.java#L108&lt;/a&gt; 참조&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;RestTeamplteBuilder&lt;/code&gt; 로 RestTemplate을 생성한다면 디폴트 등록된 ObjectMapper 을 참조하는  &lt;code&gt;MappingJackson2HttpMessageConverter&lt;/code&gt; 가 &lt;code&gt;RestTemplate&lt;/code&gt; 에 주입됩니다.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;예제_소스_저장소&quot;&gt;3. 예제 소스 저장소&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;예제는 &lt;a href=&quot;https://github.com/benelog/jackson-expriment&quot; class=&quot;bare&quot;&gt;https://github.com/benelog/jackson-expriment&lt;/a&gt; 에 올려두었습니다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;@JsonCreator&lt;/code&gt; 활용 : &lt;a href=&quot;$https://github.com/benelog/jackson-expriment/tree/master/src/test/java/net/benelog/jackson/JsonCreatorTest.java&quot;&gt;JsonCreatorTest.java&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;@ConstructorProperties&lt;/code&gt; 활용 : &lt;a href=&quot;$https://github.com/benelog/jackson-expriment/tree/master/src/test/java/net/benelog/jackson/ConstructorPropertiesTest.java&quot;&gt;ConstructorPropertiesTest.java&lt;/a&gt;&lt;/p&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;+ Lombok : &lt;a href=&quot;$https://github.com/benelog/jackson-expriment/tree/master/src/test/java/net/benelog/jackson/LombokTest.java&quot;&gt;LombokTest.java&lt;/a&gt;, &lt;a href=&quot;lombok.config&quot;&gt;lombok.config&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;ParameterNameModule&lt;/code&gt; 활용 : &lt;a href=&quot;$https://github.com/benelog/jackson-expriment/tree/master/src/test/java/net/benelog/jackson/ParameterNameModuleTest.java&quot;&gt;ParameterNameModuleTest.java&lt;/a&gt;, &lt;a href=&quot;$https://github.com/benelog/jackson-expriment/tree/master/build.gradle#L28&quot;&gt;build.gradle&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Text blocks 문법을 활용하려고 JDK 13을 쓴 예제입니다.
+InteliJ 안에서 경고가 뜬다면 &apos;Set Language level to 13(Preview)&apos; 를 선택해줍니다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;&lt;span class=&quot;image&quot;&gt;&lt;img src=&quot;img/jackson/text-blocks.png&quot; alt=&quot;text-blocks.png&quot; title=&quot;Text Block&quot;&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+	</description>
+    </item>
     <item>
       <title>ktlint로 Kotlin 공식 코딩 컨벤션 맞추기</title>
       <link>https://blog.benelog.net//ktlint.html</link>
