@@ -6,8 +6,8 @@
     <atom:link href="https://blog.benelog.net//feed.xml" rel="self" type="application/rss+xml" />
     <description>JBake Bootstrap Template</description>
     <language>en-gb</language>
-    <pubDate>Mon, 16 Mar 2020 02:26:22 +0000</pubDate>
-    <lastBuildDate>Mon, 16 Mar 2020 02:26:22 +0000</lastBuildDate>
+    <pubDate>Mon, 16 Mar 2020 11:18:12 +0000</pubDate>
+    <lastBuildDate>Mon, 16 Mar 2020 11:18:12 +0000</lastBuildDate>
 
     <item>
       <title>Jackson으로 파싱한 JSON 속성값을 생성자로 전달하기</title>
@@ -368,7 +368,7 @@ Gradle을 쓰고 있다면 아래와 같이 설정할 수 있습니다.&lt;/p&gt
 &lt;p&gt;&lt;span class=&quot;image&quot;&gt;&lt;img src=&quot;img/jackson/intellij-settings-java-compiler.png&quot; alt=&quot;intellij-settings-java-compiler.png&quot; title=&quot;Settings의 Java Compiler 설정&quot;&gt;&lt;/span&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Jackson의 ParameterNameModule 을 쓰기 위해서는 다음과 같은 의존성 추가가 필요합니다.&lt;/p&gt;
+&lt;p&gt;Jackson의 ParameterNameModule 을 쓰기 위해서는 다음과 같이 의존성을 추가해야합니다.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;title&quot;&gt;ParameterNameModule 의존성 추가&lt;/div&gt;
@@ -377,10 +377,10 @@ Gradle을 쓰고 있다면 아래와 같이 설정할 수 있습니다.&lt;/p&gt
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;&lt;code&gt;ObjectMapper&lt;/code&gt; 선언에서는 &lt;code&gt;registerModule&lt;/code&gt; 메서드로 &lt;code&gt;ParameterNamesModule&lt;/code&gt; 을 추가한다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;ObjectMapper&lt;/code&gt; 선언에서는 &lt;code&gt;registerModule()&lt;/code&gt; 메서드로 &lt;code&gt;ParameterNamesModule&lt;/code&gt; 을 추가합니다.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;listingblock&quot;&gt;
-&lt;div class=&quot;title&quot;&gt;ObjectMapper에 ParameterNamesModule 선언 추가&lt;/div&gt;
+&lt;div class=&quot;title&quot;&gt;ObjectMapper에 ParameterNamesModule 추가&lt;/div&gt;
 &lt;div class=&quot;content&quot;&gt;
 &lt;pre class=&quot;prettyprint highlight&quot;&gt;&lt;code class=&quot;language-ObjectMapper 선언&quot; data-lang=&quot;ObjectMapper 선언&quot;&gt;    var objectMapper = new ObjectMapper()
         .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
@@ -424,7 +424,7 @@ Gradle을 쓰고 있다면 아래와 같이 설정할 수 있습니다.&lt;/p&gt
 &lt;p&gt;&lt;a href=&quot;https://github.com/spring-projects/spring-boot/blob/33e414fcb2f04bec653f799228907a577ac27a10/spring-boot-project/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/jackson/JacksonAutoConfiguration.java#L108&quot;&gt;JacksonAutoConfiguration.java#L108&lt;/a&gt; 참조&lt;/p&gt;
 &lt;/li&gt;
 &lt;li&gt;
-&lt;p&gt;&lt;code&gt;RestTeamplteBuilder&lt;/code&gt; 로 RestTemplate을 생성한다면 디폴트 등록된 ObjectMapper 을 참조하는  &lt;code&gt;MappingJackson2HttpMessageConverter&lt;/code&gt; 가 &lt;code&gt;RestTemplate&lt;/code&gt; 에 주입됩니다.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;RestTeamplteBuilder&lt;/code&gt; 로 &lt;code&gt;RestTemplate&lt;/code&gt; 을 생성한다면 디폴트 등록된 ObjectMapper 을 참조하는  &lt;code&gt;MappingJackson2HttpMessageConverter&lt;/code&gt; 가 &lt;code&gt;RestTemplate&lt;/code&gt; 에 주입됩니다.&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
@@ -432,8 +432,11 @@ Gradle을 쓰고 있다면 아래와 같이 설정할 수 있습니다.&lt;/p&gt
 &lt;/ul&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Lombok과 함께 쓸때에도 &lt;code&gt;lombok.config&lt;/code&gt; 의 추가 설정 없이도 잘 동작합니다.
-이 방식의 장단점은&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;ParameterNamesModule&lt;/code&gt; 은 Lombok에서 자동으로 만든 생성자도 잘 인식합니다.
+&lt;code&gt;lombok.config&lt;/code&gt; 에 추가 설정을 하지 않아도 된다는 점이 &lt;code&gt;@ConstructorProperties&lt;/code&gt; 를 쓸 때와의 차이점입니다.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;이 방식의 장단점은&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;

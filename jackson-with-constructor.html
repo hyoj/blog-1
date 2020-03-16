@@ -530,7 +530,7 @@ Gradle을 쓰고 있다면 아래와 같이 설정할 수 있습니다.</p>
 <p><span class="image"><img src="img/jackson/intellij-settings-java-compiler.png" alt="intellij-settings-java-compiler.png" title="Settings의 Java Compiler 설정"></span></p>
 </div>
 <div class="paragraph">
-<p>Jackson의 ParameterNameModule 을 쓰기 위해서는 다음과 같은 의존성 추가가 필요합니다.</p>
+<p>Jackson의 ParameterNameModule 을 쓰기 위해서는 다음과 같이 의존성을 추가해야합니다.</p>
 </div>
 <div class="listingblock">
 <div class="title">ParameterNameModule 의존성 추가</div>
@@ -539,10 +539,10 @@ Gradle을 쓰고 있다면 아래와 같이 설정할 수 있습니다.</p>
 </div>
 </div>
 <div class="paragraph">
-<p><code>ObjectMapper</code> 선언에서는 <code>registerModule</code> 메서드로 <code>ParameterNamesModule</code> 을 추가한다.</p>
+<p><code>ObjectMapper</code> 선언에서는 <code>registerModule()</code> 메서드로 <code>ParameterNamesModule</code> 을 추가합니다.</p>
 </div>
 <div class="listingblock">
-<div class="title">ObjectMapper에 ParameterNamesModule 선언 추가</div>
+<div class="title">ObjectMapper에 ParameterNamesModule 추가</div>
 <div class="content">
 <pre class="prettyprint highlight"><code class="language-ObjectMapper 선언" data-lang="ObjectMapper 선언">    var objectMapper = new ObjectMapper()
         .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
@@ -586,7 +586,7 @@ Gradle을 쓰고 있다면 아래와 같이 설정할 수 있습니다.</p>
 <p><a href="https://github.com/spring-projects/spring-boot/blob/33e414fcb2f04bec653f799228907a577ac27a10/spring-boot-project/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/jackson/JacksonAutoConfiguration.java#L108">JacksonAutoConfiguration.java#L108</a> 참조</p>
 </li>
 <li>
-<p><code>RestTeamplteBuilder</code> 로 RestTemplate을 생성한다면 디폴트 등록된 ObjectMapper 을 참조하는  <code>MappingJackson2HttpMessageConverter</code> 가 <code>RestTemplate</code> 에 주입됩니다.</p>
+<p><code>RestTeamplteBuilder</code> 로 <code>RestTemplate</code> 을 생성한다면 디폴트 등록된 ObjectMapper 을 참조하는  <code>MappingJackson2HttpMessageConverter</code> 가 <code>RestTemplate</code> 에 주입됩니다.</p>
 </li>
 </ul>
 </div>
@@ -594,8 +594,11 @@ Gradle을 쓰고 있다면 아래와 같이 설정할 수 있습니다.</p>
 </ul>
 </div>
 <div class="paragraph">
-<p>Lombok과 함께 쓸때에도 <code>lombok.config</code> 의 추가 설정 없이도 잘 동작합니다.
-이 방식의 장단점은</p>
+<p><code>ParameterNamesModule</code> 은 Lombok에서 자동으로 만든 생성자도 잘 인식합니다.
+<code>lombok.config</code> 에 추가 설정을 하지 않아도 된다는 점이 <code>@ConstructorProperties</code> 를 쓸 때와의 차이점입니다.</p>
+</div>
+<div class="paragraph">
+<p>이 방식의 장단점은</p>
 </div>
 <div class="ulist">
 <ul>
