@@ -6,8 +6,8 @@
     <atom:link href="https://blog.benelog.net//feed.xml" rel="self" type="application/rss+xml" />
     <description>JBake Bootstrap Template</description>
     <language>en-gb</language>
-    <pubDate>Mon, 16 Mar 2020 00:15:13 +0000</pubDate>
-    <lastBuildDate>Mon, 16 Mar 2020 00:15:13 +0000</lastBuildDate>
+    <pubDate>Mon, 16 Mar 2020 00:19:49 +0000</pubDate>
+    <lastBuildDate>Mon, 16 Mar 2020 00:19:49 +0000</lastBuildDate>
 
     <item>
       <title>Jackson으로 파싱한 JSON 속성값을 생성자로 전달하기</title>
@@ -140,7 +140,7 @@
 &lt;div class=&quot;sect2&quot;&gt;
 &lt;h3 id=&quot;jsoncreator&quot;&gt;2.1. &lt;code&gt;@JsonCreator&lt;/code&gt;&lt;/h3&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
-&lt;p&gt;Jackson에서 제공하는 &lt;code&gt;@JsonCreator&lt;/code&gt;, `@JsonProperty`를 값을 전달할 생성자와 메서드 파라미터에 붙입니다.&lt;/p&gt;
+&lt;p&gt;Jackson에서 제공하는 &lt;code&gt;@JsonCreator&lt;/code&gt;, &lt;code&gt;@JsonProperty&lt;/code&gt; 를 값을 전달할 생성자와 메서드 파라미터에 붙입니다.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;listingblock&quot;&gt;
 &lt;div class=&quot;title&quot;&gt;AccessLog의 생성자에 &lt;code&gt;@JsonCreator&lt;/code&gt; 선언&lt;/div&gt;
