@@ -6,8 +6,8 @@
     <atom:link href="https://blog.benelog.net//feed.xml" rel="self" type="application/rss+xml" />
     <description>JBake Bootstrap Template</description>
     <language>en-gb</language>
-    <pubDate>Mon, 16 Mar 2020 00:26:58 +0000</pubDate>
-    <lastBuildDate>Mon, 16 Mar 2020 00:26:58 +0000</lastBuildDate>
+    <pubDate>Mon, 16 Mar 2020 00:34:17 +0000</pubDate>
+    <lastBuildDate>Mon, 16 Mar 2020 00:34:17 +0000</lastBuildDate>
 
     <item>
       <title>Jackson으로 파싱한 JSON 속성값을 생성자로 전달하기</title>
@@ -170,7 +170,7 @@ public class AccessLog {
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
-&lt;p&gt;단점&lt;/p&gt;
+&lt;p&gt;장점&lt;/p&gt;
 &lt;div class=&quot;ulist&quot;&gt;
 &lt;ul&gt;
 &lt;li&gt;
